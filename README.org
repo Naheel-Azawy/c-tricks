@@ -1,0 +1,118 @@
+* C-TRICKS
+The worst way to use C!
+Please do not use this in any serious project!!
+Also, note that most probably this is not gonna work if you're not using gcc
+
+** Lambda:
+#+BEGIN_SRC C
+#include <stdio.h>
+#include "ctricks.h"
+
+int main(int argc, char** argv) {
+
+  int (*foo)() = lambda(int, (int i) {
+      printf("Hello lambda %d\n", i);
+      return i;
+    });
+
+  int j = foo(1);
+  printf("j = %d\n", j);
+
+	return 0;
+}
+#+END_SRC
+
+** Threads:
+#+BEGIN_SRC c
+#include <stdio.h>
+#include <pthread.h>
+#include "ctricks.h"
+
+int main() {
+
+  pthread_t t;
+  start_thread(t, {
+      printf("Hiiii!\n");
+    });
+  pthread_join(t, NULL);
+
+  return 0;
+}
+#+END_SRC
+
+** For each:
+#+BEGIN_SRC c
+  #include <stdio.h>
+  #include "ctricks.h"
+
+  void somefunc(int i) {
+    printf("somefunc: %d\n", i);
+  }
+
+  int main(int argc, char** argv) {
+
+    int ints[] = { 1, 2, 3, 4, 5 };
+    foreach(int, i, ints, {
+        printf("%d\n", i);
+      });
+
+    char* strs[] = { "hi!", "hello!!", "hello world", "just", "testing" };
+    foreach(char*, s, strs, {
+        printf("%s\n", s);
+      });
+
+    char** strsp = malloc(sizeof(char*)*2);
+    strsp[0] = "abcd";
+    strsp[1] = "efgh";
+    foreachn(char*, s, strsp, 2, {
+        printf("%s\n", s);
+      });
+
+    void (*myfun)(int i) = somefunc;
+    foreachf(int, i, ints, myfun);
+
+    return 0;
+  }
+#+END_SRC
+
+** Errors:
+#+BEGIN_SRC c
+#include <stdio.h>
+#include "ctricks.h"
+
+int main(void) {
+
+	errordef(my_err1);
+  errordef(my_err2);
+
+  try ({
+      printf("Helloo\n");
+      throw(new_my_err1_error_msg("hiiiii!"));
+      printf("This will not be printed!\n");
+    }, /*catch*/ any, e, {
+      printf("My lovely error: %s %s\n", e->name, e->msg);
+    });
+
+  printf("\n");
+
+  try ({
+      printf("Helloo\n");
+      throw(new_my_err2_error_msg("my msg!"));
+      printf("This will not be printed!\n");
+    }, /*catch*/ my_err2, e, {
+      printerr("%s", e->msg);
+    });
+
+	printf("\n");
+
+  try ({
+      printf("Helloo\n");
+      throw(new_my_err1_error());
+      printf("This will not be printed!\n");
+    }, /*catch*/ my_err2, e, {
+      printf("Catch %s if you can!\n", e->name);
+    });
+
+	return 0;
+}
+#+END_SRC
